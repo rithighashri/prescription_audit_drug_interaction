@@ -82,6 +82,20 @@ class User(db.Model):
     role = db.Column(db.String(20), nullable=False)  # 'doctor' or 'admin'
     full_name = db.Column(db.String(100))
 
+
+def serialize_prescription(p):
+    """Return the format used by the admin prescription tables."""
+    log = AuditLog.query.filter_by(prescription_id=p.id).order_by(AuditLog.timestamp.desc()).first()
+    return {
+        "id": p.id,
+        "patient_id": p.patient_id,
+        "doctor_name": p.doctor_name,
+        "drugs": [d.name for d in p.drugs],
+        "created_at": p.created_at.strftime('%Y-%m-%d %H:%M:%S') if p.created_at else None,
+        "was_overridden": log.action == 'override' if log else False,
+        "override_reason": log.override_reason if log else None
+    }
+
 # ---------- ROUTES ----------
 
 @app.route('/')
@@ -241,19 +255,46 @@ def get_prescriptions_detailed():
         query = query.filter(Prescription.doctor_name == doctor_filter)
     prescriptions = query.order_by(Prescription.created_at.desc()).all()
 
-    result = []
-    for p in prescriptions:
-        log = AuditLog.query.filter_by(prescription_id=p.id).order_by(AuditLog.timestamp.desc()).first()
-        result.append({
-            "id": p.id,
-            "patient_id": p.patient_id,
-            "doctor_name": p.doctor_name,
-            "drugs": [d.name for d in p.drugs],
-            "created_at": p.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            "was_overridden": log.action == 'override' if log else False,
-            "override_reason": log.override_reason if log else None
+    return jsonify([serialize_prescription(p) for p in prescriptions])
+
+@app.route('/dashboard', methods=['GET'])
+def get_dashboard():
+    """Load the admin dashboard from one consistent database snapshot."""
+    logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).all()
+    total = len(logs)
+    overrides = sum(log.action == 'override' for log in logs)
+
+    doctors = db.session.query(AuditLog.doctor_name).distinct().all()
+    doctor_summary = []
+    for (doctor_name,) in doctors:
+        doctor_logs = [log for log in logs if log.doctor_name == doctor_name]
+        doctor_overrides = sum(log.action == 'override' for log in doctor_logs)
+        doctor_summary.append({
+            "doctor_name": doctor_name,
+            "total_prescriptions": len(doctor_logs),
+            "overrides": doctor_overrides,
+            "override_rate_percent": round((doctor_overrides / len(doctor_logs)) * 100, 1) if doctor_logs else 0
         })
-    return jsonify(result)
+    doctor_summary.sort(key=lambda item: -item['override_rate_percent'])
+
+    return jsonify({
+        "audit_logs": [{
+            "id": log.id,
+            "prescription_id": log.prescription_id,
+            "action": log.action,
+            "doctor_name": log.doctor_name,
+            "details": log.details,
+            "override_reason": log.override_reason,
+            "timestamp": log.timestamp.strftime('%Y-%m-%d %H:%M:%S') if log.timestamp else None
+        } for log in logs],
+        "stats": {
+            "total_actions": total,
+            "total_overrides": overrides,
+            "override_rate_percent": round((overrides / total) * 100, 1) if total else 0
+        },
+        "doctor_summary": doctor_summary,
+        "prescriptions": [serialize_prescription(p) for p in Prescription.query.order_by(Prescription.created_at.desc()).all()]
+    })
 @app.route('/doctors/override-summary', methods=['GET'])
 def doctor_override_summary():
     doctors = db.session.query(AuditLog.doctor_name).distinct().all()

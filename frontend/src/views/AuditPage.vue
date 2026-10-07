@@ -1,6 +1,7 @@
 <template>
   <div>
-    <section class="card">
+    <p v-if="loadError" class="error-msg">{{ loadError }}</p>
+  <section v-if="!loading" class="card">
       <h2>Audit Dashboard</h2>
       <div class="stats-row">
         <div class="stat-box">
@@ -18,7 +19,7 @@
       </div>
     </section>
 
-    <section class="card">
+  <section v-if="!loading" class="card">
       <h2>Override Rate by Doctor</h2>
       <table class="data-table">
         <thead>
@@ -39,7 +40,7 @@
       </table>
     </section>
 
-    <section class="card">
+  <section v-if="!loading" class="card">
       <h2>All Prescriptions</h2>
       <table class="data-table">
         <thead>
@@ -63,7 +64,7 @@
       </table>
     </section>
 
-    <section class="card">
+  <section v-if="!loading" class="card">
       <h2>Full Audit Log</h2>
       <table class="data-table">
         <thead>
@@ -93,18 +94,21 @@ const auditLogs = ref([])
 const stats = ref({ total_actions: 0, total_overrides: 0, override_rate_percent: 0 })
 const doctorSummary = ref([])
 const allPrescriptions = ref([])
+const loading = ref(true)
+const loadError = ref('')
 
 onMounted(async () => {
-  const logsRes = await axios.get('http://127.0.0.1:5000/audit-log')
-  auditLogs.value = logsRes.data
-
-  const statsRes = await axios.get('http://127.0.0.1:5000/audit-log/stats')
-  stats.value = statsRes.data
-
-  const doctorsRes = await axios.get('http://127.0.0.1:5000/doctors/override-summary')
-  doctorSummary.value = doctorsRes.data
-
-  const prescriptionsRes = await axios.get('http://127.0.0.1:5000/prescriptions/detailed')
-  allPrescriptions.value = prescriptionsRes.data
+  try {
+    const { data } = await axios.get('http://127.0.0.1:5000/dashboard')
+    auditLogs.value = data.audit_logs
+    stats.value = data.stats
+    doctorSummary.value = data.doctor_summary
+    allPrescriptions.value = data.prescriptions
+  } catch (error) {
+    console.error('Unable to load the audit dashboard:', error)
+    loadError.value = 'Unable to load dashboard data. Confirm that the backend is running, then refresh this page.'
+  } finally {
+    loading.value = false
+  }
 })
 </script>
