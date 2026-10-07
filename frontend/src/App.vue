@@ -13,6 +13,7 @@
     <RouterLink to="/add-patient">Add Patient</RouterLink>
     <RouterLink to="/prescriptions">New Prescription</RouterLink>
     <RouterLink v-if="user?.role === 'admin'" to="/audit">Audit Dashboard</RouterLink>
+    <RouterLink v-if="user?.role === 'admin'" to="/all-prescriptions">All Prescriptions</RouterLink>
   </nav>
 </header>
 

@@ -5,6 +5,7 @@ import AddPatientPage from './views/AddPatientPage.vue'
 import PrescriptionPage from './views/PrescriptionPage.vue'
 import AuditPage from './views/AuditPage.vue'
 import { getUser } from './auth.js'
+import AllPrescriptionsPage from './views/AllPrescriptionsPage.vue'
 
 const routes = [
   { path: '/', redirect: '/patients' },
@@ -13,6 +14,7 @@ const routes = [
   { path: '/add-patient', component: AddPatientPage, meta: { requiresAuth: true } },
   { path: '/prescriptions', component: PrescriptionPage, meta: { requiresAuth: true } },
   { path: '/audit', component: AuditPage, meta: { requiresAuth: true, adminOnly: true } },
+  { path: '/all-prescriptions', component: AllPrescriptionsPage, meta: { requiresAuth: true, adminOnly: true } },
 ]
 
 const router = createRouter({

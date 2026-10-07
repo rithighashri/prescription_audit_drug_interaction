@@ -19,6 +19,15 @@
       <label>Doctor Name</label>
       <input v-model="form.doctor_name" type="text" placeholder="e.g. Dr. Smith" />
     </div>
+    <div class="form-row">
+  <label>Condition / Diagnosis</label>
+  <input v-model="form.condition" type="text" placeholder="e.g. Hypertension, Type 2 Diabetes" />
+</div>
+
+<div class="form-row">
+  <label>Remarks <span class="hint">(optional clinical notes)</span></label>
+  <input v-model="form.remarks" type="text" placeholder="Any additional notes for this prescription" />
+</div>
 
     <div class="form-row">
       <label>Select Drugs</label>
@@ -85,10 +94,11 @@ const drugSearch = ref('')
 const form = ref({
   patient_id: null,
   doctor_name: '',
+  condition: '',
+  remarks: '',
   drug_ids: [],
   override_reason: ''
 })
-
 const selectedPatient = computed(() =>
   patients.value.find(p => p.id === form.value.patient_id)
 )

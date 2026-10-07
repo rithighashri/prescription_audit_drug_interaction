@@ -62,9 +62,10 @@ class Prescription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
     doctor_name = db.Column(db.String(100))
+    condition = db.Column(db.String(255))
+    remarks = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     drugs = db.relationship('Drug', secondary=prescription_drugs, backref='prescriptions')
-
 class AuditLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     prescription_id = db.Column(db.Integer, db.ForeignKey('prescription.id'))
@@ -145,9 +146,11 @@ def add_prescription():
         }), 200
 
     new_prescription = Prescription(
-        patient_id=data['patient_id'],
-        doctor_name=data.get('doctor_name')
-    )
+    patient_id=data['patient_id'],
+    doctor_name=data.get('doctor_name'),
+    condition=data.get('condition'),
+    remarks=data.get('remarks')
+)
     new_prescription.drugs = drugs
     db.session.add(new_prescription)
     db.session.commit()
@@ -232,7 +235,12 @@ def login():
     })
 @app.route('/prescriptions/detailed', methods=['GET'])
 def get_prescriptions_detailed():
-    prescriptions = Prescription.query.order_by(Prescription.created_at.desc()).all()
+    doctor_filter = request.args.get('doctor_name')
+    query = Prescription.query
+    if doctor_filter:
+        query = query.filter(Prescription.doctor_name == doctor_filter)
+    prescriptions = query.order_by(Prescription.created_at.desc()).all()
+
     result = []
     for p in prescriptions:
         log = AuditLog.query.filter_by(prescription_id=p.id).order_by(AuditLog.timestamp.desc()).first()
