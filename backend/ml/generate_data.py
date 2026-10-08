@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 np.random.seed(42)
-n = 500  # number of synthetic past prescriptions
+n = 2000  # more rows = more stable training
 
 df = pd.DataFrame({
     'severity': np.random.choice([1, 2, 3], n, p=[0.5, 0.3, 0.2]),        # 1=minor, 2=moderate, 3=major
@@ -13,16 +13,27 @@ df = pd.DataFrame({
     'time_of_day_busy': np.random.choice([0, 1], n, p=[0.6, 0.4])          # 1 = busy period
 })
 
-# Build a realistic probability of override based on the rules above
-prob_override = (
-    0.15
-    - 0.05 * df['severity']                  # higher severity -> less likely to override
-    + 0.5 * df['doctor_override_rate']       # doctor's own history matters most
-    + 0.15 * df['time_of_day_busy']          # busy time -> more likely to override
-    + 0.02 * df['active_med_count']          # more meds -> slightly more likely
+# Build a sharper, more deterministic decision boundary using a logistic (sigmoid) function.
+# Coefficients are scaled up so the probability pushes strongly toward 0 or 1,
+# instead of hovering in a soft middle range.
+linear_score = (
+    -3.0
+    - 0.9 * df['severity']                      # higher severity -> much less likely to override
+    + 7.0 * (df['doctor_override_rate'] - 0.3)  # doctor's own history matters most
+    + 1.8 * df['time_of_day_busy']               # busy time -> more likely to override
+    + 0.35 * df['active_med_count']              # more meds -> slightly more likely
+    - 0.03 * (df['patient_age'] - 50)            # older patients -> doctors more cautious
 )
 
-df['will_override'] = (np.random.rand(n) < prob_override.clip(0, 1)).astype(int)
+prob_override = 1 / (1 + np.exp(-linear_score))  # sigmoid sharpens the decision
+
+# Deterministic label from the sharpened probability
+deterministic_label = (prob_override > 0.5).astype(int)
+
+# Add only a small amount of realistic noise (5% random flips),
+# instead of using the raw probability as a coin-flip threshold
+noise_mask = np.random.rand(n) < 0.05
+df['will_override'] = np.where(noise_mask, 1 - deterministic_label, deterministic_label)
 
 df.to_csv('override_training_data.csv', index=False)
 print(f"Generated {n} rows. Override rate in data: {df['will_override'].mean():.2%}")
