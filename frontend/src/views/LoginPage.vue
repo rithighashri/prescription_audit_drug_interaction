@@ -69,19 +69,19 @@ async function login() {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: radial-gradient(circle at top, #1a1b22, #0d0e12);
+  background: radial-gradient(circle at top, #cae9ff, #f7fbff 62%, #e8f3ff);
   padding: 2rem;
 }
 
 .login-card {
-  background: #1e1f26;
-  border: 1px solid #2f3038;
+  background: #ffffff;
+  border: 1px solid #cbd9ea;
   border-radius: 20px;
   padding: 3.5rem 3rem;
   width: 100%;
   max-width: 480px;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(35, 97, 158, 0.18);
 }
 
 .login-icon {
@@ -92,7 +92,7 @@ async function login() {
 .login-card h1 {
   font-size: 2rem;
   margin-bottom: 0.4rem;
-  background: linear-gradient(90deg, #6ea8fe, #a78bfa);
+  background: linear-gradient(90deg, #0878e8, #7c3aed);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -100,7 +100,7 @@ async function login() {
 }
 
 .subtitle {
-  color: #9ca3af;
+  color: #486581;
   margin-bottom: 2.5rem;
   font-size: 1.05rem;
 }
@@ -114,7 +114,7 @@ async function login() {
   display: block;
   margin-bottom: 0.6rem;
   font-weight: 600;
-  color: #d1d5db;
+  color: #102a43;
   font-size: 0.95rem;
 }
 
@@ -122,17 +122,17 @@ async function login() {
   width: 100%;
   padding: 1rem 1.2rem;
   border-radius: 10px;
-  border: 1px solid #3a3b45;
-  background: #14151a;
-  color: #f5f5f5;
+  border: 1px solid #b9cce0;
+  background: #f8fbff;
+  color: #102a43;
   font-size: 1.05rem;
   transition: border-color 0.15s;
 }
 
 .form-row input:focus {
   outline: none;
-  border-color: #6ea8fe;
-  box-shadow: 0 0 0 3px rgba(110, 168, 254, 0.15);
+  border-color: #0866d8;
+  box-shadow: 0 0 0 3px rgba(8, 102, 216, 0.15);
 }
 
 .btn-full {
@@ -143,7 +143,7 @@ async function login() {
 }
 
 .error-msg {
-  color: #ff6b6b;
+  color: #c62828;
   margin-top: 1.2rem;
   font-size: 0.95rem;
 }
@@ -151,13 +151,13 @@ async function login() {
 .login-hint {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #2f3038;
-  color: #6b7280;
+  border-top: 1px solid #d7e3f0;
+  color: #486581;
   font-size: 0.85rem;
   line-height: 1.6;
 }
 
 .login-hint strong {
-  color: #9ca3af;
+  color: #1f4f82;
 }
 </style>
