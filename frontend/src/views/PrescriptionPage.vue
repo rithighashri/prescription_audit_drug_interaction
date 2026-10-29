@@ -81,7 +81,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import axios from 'axios'
+import api from '../api.js'
 
 const patients = ref([])
 const drugs = ref([])
@@ -114,15 +114,15 @@ const filteredDrugs = computed(() =>
 )
 
 onMounted(async () => {
-  const patientsRes = await axios.get('http://127.0.0.1:5000/patients')
+  const patientsRes = await api.get('/patients')
   patients.value = patientsRes.data
-  const drugsRes = await axios.get('http://127.0.0.1:5000/drugs')
+  const drugsRes = await api.get('/drugs')
   drugs.value = drugsRes.data
 })
 
 async function submitPrescription() {
   try {
-    const res = await axios.post('http://127.0.0.1:5000/prescriptions', form.value)
+    const res = await api.post('/prescriptions', form.value)
 
     if (res.data.requires_override) {
       warnings.value = res.data.interaction_warnings
@@ -133,7 +133,7 @@ async function submitPrescription() {
                           : warnings.value[0].severity === 'moderate' ? 2 : 1
       const currentHour = new Date().getHours()
 
-      const predictRes = await axios.post('http://127.0.0.1:5000/predict-override-risk', {
+      const predictRes = await api.post('/predict-override-risk', {
         severity: topSeverity,
         patient_age: selectedPatient.value?.age || 50,
         allergy_count: selectedPatient.value?.allergies ? 1 : 0,

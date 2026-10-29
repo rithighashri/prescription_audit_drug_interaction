@@ -39,7 +39,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import axios from 'axios'
+import api from '../api.js'
 
 const allPrescriptions = ref([])
 const prescriptions = ref([])
@@ -51,12 +51,12 @@ const doctorNames = computed(() =>
 
 async function loadPrescriptions() {
   const params = selectedDoctor.value ? { doctor_name: selectedDoctor.value } : {}
-  const res = await axios.get('http://127.0.0.1:5000/prescriptions/detailed', { params })
+  const res = await api.get('/prescriptions/detailed', { params })
   prescriptions.value = res.data
 }
 
 onMounted(async () => {
-  const allRes = await axios.get('http://127.0.0.1:5000/prescriptions/detailed')
+  const allRes = await api.get('/prescriptions/detailed')
   allPrescriptions.value = allRes.data
   prescriptions.value = allRes.data
 })

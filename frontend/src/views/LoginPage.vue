@@ -32,7 +32,7 @@
 
       <div class="login-hint">
         <p>Demo accounts:</p>
-        <p><strong>Doctor:</strong> dr.smith / doctor123</p>
+        <p><strong>Doctor:</strong> dr.smith0 / doctor123</p>
         <p><strong>Admin:</strong> admin / admin123</p>
       </div>
     </div>
@@ -41,7 +41,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
+import api from '../api.js'
 import { useRouter } from 'vue-router'
 
 const username = ref('')
@@ -51,7 +51,7 @@ const router = useRouter()
 
 async function login() {
   try {
-    const res = await axios.post('http://127.0.0.1:5000/login', {
+    const res = await api.post('/login', {
       username: username.value,
       password: password.value
     })

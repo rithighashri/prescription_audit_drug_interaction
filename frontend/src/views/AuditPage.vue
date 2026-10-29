@@ -88,7 +88,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import api from '../api.js'
 
 const auditLogs = ref([])
 const stats = ref({ total_actions: 0, total_overrides: 0, override_rate_percent: 0 })
@@ -99,7 +99,7 @@ const loadError = ref('')
 
 onMounted(async () => {
   try {
-    const { data } = await axios.get('http://127.0.0.1:5000/dashboard')
+    const { data } = await api.get('/dashboard')
     auditLogs.value = data.audit_logs
     stats.value = data.stats
     doctorSummary.value = data.doctor_summary

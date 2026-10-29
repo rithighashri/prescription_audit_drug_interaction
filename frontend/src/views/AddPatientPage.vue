@@ -29,14 +29,14 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
+import api from '../api.js'
 
 const newPatient = ref({ name: '', age: null, gender: '', allergies: '' })
 const message = ref('')
 
 async function addPatient() {
   try {
-    const res = await axios.post('http://127.0.0.1:5000/patients', newPatient.value)
+    const res = await api.post('/patients', newPatient.value)
     message.value = `${newPatient.value.name} added (ID: ${res.data.id})`
     newPatient.value = { name: '', age: null, gender: '', allergies: '' }
   } catch (err) {

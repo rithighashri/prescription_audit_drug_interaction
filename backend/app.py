@@ -4,11 +4,18 @@ from flask_cors import CORS
 from datetime import datetime
 import json
 import joblib
+import os
 override_model = joblib.load('ml/override_predictor.pkl')
 
 app = Flask(__name__)
 CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:newpassword@localhost/prescription_audit'
+database_url = os.environ.get(
+    'DATABASE_URL',
+    'mysql+pymysql://root:newpassword@localhost/prescription_audit'
+)
+if database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)

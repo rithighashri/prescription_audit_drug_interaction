@@ -20,12 +20,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import api from '../api.js'
 
 const patients = ref([])
 
 onMounted(async () => {
-  const res = await axios.get('http://127.0.0.1:5000/patients')
+  const res = await api.get('/patients')
   patients.value = res.data
 })
 </script>
