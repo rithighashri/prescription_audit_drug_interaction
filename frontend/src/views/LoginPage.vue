@@ -43,6 +43,7 @@
 import { ref } from 'vue'
 import api from '../api.js'
 import { useRouter } from 'vue-router'
+import { setUser } from '../auth.js'
 
 const username = ref('')
 const password = ref('')
@@ -55,7 +56,7 @@ async function login() {
       username: username.value,
       password: password.value
     })
-    localStorage.setItem('user', JSON.stringify(res.data))
+    setUser(res.data)
     router.push('/patients')
   } catch (err) {
     error.value = 'Invalid username or password'

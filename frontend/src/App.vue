@@ -25,11 +25,11 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getUser, logout } from './auth.js'
+import { currentUser, logout } from './auth.js'
 
 const route = useRoute()
 const router = useRouter()
-const user = computed(() => getUser())
+const user = currentUser
 const isLoginPage = computed(() => route.path === '/login')
 
 function handleLogout() {
